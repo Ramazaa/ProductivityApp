@@ -4,16 +4,36 @@ import android.content.Context
 import androidx.room.Room
 import com.example.productivityapp.feature_todo.data.local.TodoDao
 import com.example.productivityapp.feature_todo.data.local.TodoDatabase
+import com.example.productivityapp.feature_todo.data.remote.TodoApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.create
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 object TodoModule {
+
+    @Provides
+    fun providesRetrofitApi(retrofit: Retrofit): TodoApi{
+        return retrofit.create(TodoApi::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun providesRetrofit(): Retrofit{
+        return Retrofit.Builder()
+            .addConverterFactory(
+                GsonConverterFactory.create()
+            ).baseUrl("https://todo-7d5e2-default-rtdb.firebaseio.com/todo")
+            .build()
+    }
+
     @Provides
     fun providesRoomDao(database: TodoDatabase): TodoDao {
         return database.dao
